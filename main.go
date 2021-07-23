@@ -21,6 +21,7 @@ func main() {
 	weatherHandler := handler.NewWeatherHandler()
 	http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/api/weather/now/", weatherHandler.Now)
+	http.HandleFunc("/api/weather/forecast/", weatherHandler.Forecast)
 	http.HandleFunc("/geoapi/city/top/", weatherHandler.CityTop)
 	http.HandleFunc("/geoapi/city/lookup/", weatherHandler.CityLookup)
 

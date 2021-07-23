@@ -46,6 +46,22 @@ func (h *WeatherHandler) Now(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(resp))
 }
 
+// Forecast 天气预报
+func (h *WeatherHandler) Forecast(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	location := query.Get("location")
+	duration := query.Get("duration")
+	client, err := qweather.NewWeatherForecastClient(location, duration)
+	if err != nil {
+		log.Printf("qweather.NewWeatherForecastClient error: %v, location: %s, duration: %s", err, location, duration)
+	}
+	resp, err := client.Run(h.qweatherCredential, nil)
+	if err != nil {
+		log.Printf("client.Run error: %v", err)
+	}
+	w.Write([]byte(resp))
+}
+
 func (h *WeatherHandler) CityTop(w http.ResponseWriter, r *http.Request) {
 	//rawQuery := r.URL.RawQuery
 	client := qweather.NewGeoTopCityClient()
