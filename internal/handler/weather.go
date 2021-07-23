@@ -73,17 +73,14 @@ func (h *WeatherHandler) CityTop(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(resp))
 }
 
+// CityLookup 城市搜索服务
 func (h *WeatherHandler) CityLookup(w http.ResponseWriter, r *http.Request) {
-	// todo:从r中获取请求参数
-	rawQuery := r.URL.RawQuery
-	log.Println("rawQuery:", rawQuery)
-
-	// 城市搜索服务
-	client := qweather.NewGeoCityClient(rawQuery)
+	query := r.URL.Query()
+	location := query.Get("location")
+	client := qweather.NewGeoCityClient(location)
 	resp, err := client.Run(h.qweatherCredential, nil)
 	if err != nil {
 		log.Printf("got city lookup error: %v", err)
-
 	}
 	w.Write([]byte(resp))
 }
