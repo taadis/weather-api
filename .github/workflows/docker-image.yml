@@ -17,11 +17,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images:
-            - taadis/weather-api
-          tags:
-            - type=semver,pattern={{version}}
-            - type=sha
+          images: |
+            taadis/weather-api
+          tags: |
+            type=semver,pattern={{version}}
+            type=sha
 
       # https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Login to DockerHub
