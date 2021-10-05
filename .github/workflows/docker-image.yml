@@ -13,6 +13,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images:
+            - taadis/weather-api
+          tags:
+            - type=semver,pattern={{version}}
+            - type=sha
 
       # https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Login to DockerHub
@@ -24,4 +33,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: taadis/weather-api:$(date +%s)
+          tags: ${{ steps.meta.outputs.tags }}
