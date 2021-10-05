@@ -11,7 +11,7 @@ ADD . /app/
 WORKDIR /app
 
 # Update GOPROXY
-RUN go env -w GOPROXY=https://goproxy.io,direct && go env GOPROXY
+#RUN go env -w GOPROXY=https://goproxy.io,direct && go env GOPROXY
 
 # Build the binary
 RUN go mod tidy
