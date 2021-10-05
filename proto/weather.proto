@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package proto;
+
+import "github.com/gogo/protobuf@v1.3.2/gogoproto/gogo.proto";
+
+service Weather {
+  // 天气生活指数
+  rpc Indices (IndicesRequest) returns (IndicesResponse) {
+    //    option (google.api.http) = {
+    //      post: "/weather/indices"
+    //      body: "*"
+    //    };
+  }
+  //
+  rpc TopCity (TopCityRequest) returns (TopCityResponse);
+}
+
+message TopCityRequest {
+
+}
+
+message TopCityResponse {
+  string Result = 1 [(gogoproto.jsontag) = "result,omitempty"];
+}
+
+message IndicesRequest {
+  int64 Days = 1 [(gogoproto.jsontag) = "days"];
+}
+
+message IndicesResponse {
+  int64 Days = 1 [(gogoproto.jsontag) = "days"];
+}

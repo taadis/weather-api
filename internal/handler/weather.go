@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 
 	qweather "github.com/Ink-33/go-heweather/v7"
+	"github.com/taadis/weather-api/proto"
 )
 
 const (
@@ -32,6 +34,12 @@ func (h *WeatherHandler) getPublicId() string {
 func (h *WeatherHandler) getKey() string {
 	key := os.Getenv(QWEATHER_KEY)
 	return key
+}
+
+func (h *WeatherHandler) Indices(ctx context.Context, req *proto.IndicesRequest, resp *proto.IndicesResponse) error {
+	log.Print("Received WeatherService.Indices request...")
+	resp.Days = req.Days
+	return nil
 }
 
 // Now 实时天气
@@ -62,7 +70,7 @@ func (h *WeatherHandler) Forecast(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(resp))
 }
 
-func (h *WeatherHandler) CityTop(w http.ResponseWriter, r *http.Request) {
+func (h *WeatherHandler) CityTopOld(w http.ResponseWriter, r *http.Request) {
 	//rawQuery := r.URL.RawQuery
 	client := qweather.NewGeoTopCityClient()
 	resp, err := client.Run(h.qweatherCredential, nil)
@@ -71,6 +79,17 @@ func (h *WeatherHandler) CityTop(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(resp))
+}
+
+func (h *WeatherHandler) TopCity(ctx context.Context, req *proto.TopCityRequest, resp *proto.TopCityResponse) error {
+	client := qweather.NewGeoTopCityClient()
+	topCityResp, err := client.Run(h.qweatherCredential, nil)
+	if err != nil {
+		log.Printf("qweather.NewGeoTopCityClient client.Run error: %v", err)
+		return err
+	}
+	resp.Result = topCityResp
+	return nil
 }
 
 // CityLookup 城市搜索服务

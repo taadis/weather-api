@@ -1,0 +1,21 @@
+name: Docker Image CI
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # https://github.com/marketplace/actions/build-and-push-docker-images
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v1
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: taadis/weather-api
+          tag_with_sha: true
