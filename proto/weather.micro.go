@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/golang/protobuf/proto"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	math "math"
 )
 
@@ -37,8 +38,10 @@ var _ server.Option
 type WeatherService interface {
 	// 天气生活指数
 	Indices(ctx context.Context, in *IndicesRequest, opts ...client.CallOption) (*IndicesResponse, error)
-	//
-	TopCity(ctx context.Context, in *TopCityRequest, opts ...client.CallOption) (*TopCityResponse, error)
+	// 实时天气
+	Now(ctx context.Context, in *NowRequest, opts ...client.CallOption) (*NowResponse, error)
+	// 逐天天气预报
+	Forecast(ctx context.Context, in *ForecastRequest, opts ...client.CallOption) (*ForecastResponse, error)
 }
 
 type weatherService struct {
@@ -69,9 +72,19 @@ func (c *weatherService) Indices(ctx context.Context, in *IndicesRequest, opts .
 	return out, nil
 }
 
-func (c *weatherService) TopCity(ctx context.Context, in *TopCityRequest, opts ...client.CallOption) (*TopCityResponse, error) {
-	req := c.c.NewRequest(c.name, "Weather.TopCity", in)
-	out := new(TopCityResponse)
+func (c *weatherService) Now(ctx context.Context, in *NowRequest, opts ...client.CallOption) (*NowResponse, error) {
+	req := c.c.NewRequest(c.name, "Weather.Now", in)
+	out := new(NowResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *weatherService) Forecast(ctx context.Context, in *ForecastRequest, opts ...client.CallOption) (*ForecastResponse, error) {
+	req := c.c.NewRequest(c.name, "Weather.Forecast", in)
+	out := new(ForecastResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,14 +97,17 @@ func (c *weatherService) TopCity(ctx context.Context, in *TopCityRequest, opts .
 type WeatherHandler interface {
 	// 天气生活指数
 	Indices(context.Context, *IndicesRequest, *IndicesResponse) error
-	//
-	TopCity(context.Context, *TopCityRequest, *TopCityResponse) error
+	// 实时天气
+	Now(context.Context, *NowRequest, *NowResponse) error
+	// 逐天天气预报
+	Forecast(context.Context, *ForecastRequest, *ForecastResponse) error
 }
 
 func RegisterWeatherHandler(s server.Server, hdlr WeatherHandler, opts ...server.HandlerOption) error {
 	type weather interface {
 		Indices(ctx context.Context, in *IndicesRequest, out *IndicesResponse) error
-		TopCity(ctx context.Context, in *TopCityRequest, out *TopCityResponse) error
+		Now(ctx context.Context, in *NowRequest, out *NowResponse) error
+		Forecast(ctx context.Context, in *ForecastRequest, out *ForecastResponse) error
 	}
 	type Weather struct {
 		weather
@@ -108,6 +124,10 @@ func (h *weatherHandler) Indices(ctx context.Context, in *IndicesRequest, out *I
 	return h.WeatherHandler.Indices(ctx, in, out)
 }
 
-func (h *weatherHandler) TopCity(ctx context.Context, in *TopCityRequest, out *TopCityResponse) error {
-	return h.WeatherHandler.TopCity(ctx, in, out)
+func (h *weatherHandler) Now(ctx context.Context, in *NowRequest, out *NowResponse) error {
+	return h.WeatherHandler.Now(ctx, in, out)
+}
+
+func (h *weatherHandler) Forecast(ctx context.Context, in *ForecastRequest, out *ForecastResponse) error {
+	return h.WeatherHandler.Forecast(ctx, in, out)
 }

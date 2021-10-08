@@ -13,6 +13,6 @@ require (
 	github.com/nats-io/nats.go v1.9.1 // indirect
 	github.com/prometheus/procfs v0.0.5 // indirect
 	go.uber.org/zap v1.12.0 // indirect
-	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a // indirect
+	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
 	google.golang.org/grpc v1.25.1 // indirect
 )

@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -23,21 +24,23 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type TopCityRequest struct {
+type ForecastRequest struct {
+	Location string `protobuf:"bytes,1,opt,name=Location,json=location,proto3" json:"location,omitempty"`
+	Duration string `protobuf:"bytes,2,opt,name=Duration,json=duration,proto3" json:"duration,omitempty"`
 }
 
-func (m *TopCityRequest) Reset()         { *m = TopCityRequest{} }
-func (m *TopCityRequest) String() string { return proto.CompactTextString(m) }
-func (*TopCityRequest) ProtoMessage()    {}
-func (*TopCityRequest) Descriptor() ([]byte, []int) {
+func (m *ForecastRequest) Reset()         { *m = ForecastRequest{} }
+func (m *ForecastRequest) String() string { return proto.CompactTextString(m) }
+func (*ForecastRequest) ProtoMessage()    {}
+func (*ForecastRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ecdc6c2fb8d35c9c, []int{0}
 }
-func (m *TopCityRequest) XXX_Unmarshal(b []byte) error {
+func (m *ForecastRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *TopCityRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ForecastRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_TopCityRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ForecastRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -47,34 +50,48 @@ func (m *TopCityRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *TopCityRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TopCityRequest.Merge(m, src)
+func (m *ForecastRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ForecastRequest.Merge(m, src)
 }
-func (m *TopCityRequest) XXX_Size() int {
+func (m *ForecastRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *TopCityRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_TopCityRequest.DiscardUnknown(m)
+func (m *ForecastRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ForecastRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_TopCityRequest proto.InternalMessageInfo
+var xxx_messageInfo_ForecastRequest proto.InternalMessageInfo
 
-type TopCityResponse struct {
-	Result string `protobuf:"bytes,1,opt,name=Result,proto3" json:"result,omitempty"`
+func (m *ForecastRequest) GetLocation() string {
+	if m != nil {
+		return m.Location
+	}
+	return ""
 }
 
-func (m *TopCityResponse) Reset()         { *m = TopCityResponse{} }
-func (m *TopCityResponse) String() string { return proto.CompactTextString(m) }
-func (*TopCityResponse) ProtoMessage()    {}
-func (*TopCityResponse) Descriptor() ([]byte, []int) {
+func (m *ForecastRequest) GetDuration() string {
+	if m != nil {
+		return m.Duration
+	}
+	return ""
+}
+
+type ForecastResponse struct {
+	Result string `protobuf:"bytes,1,opt,name=Result,json=result,proto3" json:"result,omitempty"`
+}
+
+func (m *ForecastResponse) Reset()         { *m = ForecastResponse{} }
+func (m *ForecastResponse) String() string { return proto.CompactTextString(m) }
+func (*ForecastResponse) ProtoMessage()    {}
+func (*ForecastResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ecdc6c2fb8d35c9c, []int{1}
 }
-func (m *TopCityResponse) XXX_Unmarshal(b []byte) error {
+func (m *ForecastResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *TopCityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ForecastResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_TopCityResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ForecastResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -84,19 +101,107 @@ func (m *TopCityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *TopCityResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TopCityResponse.Merge(m, src)
+func (m *ForecastResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ForecastResponse.Merge(m, src)
 }
-func (m *TopCityResponse) XXX_Size() int {
+func (m *ForecastResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *TopCityResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_TopCityResponse.DiscardUnknown(m)
+func (m *ForecastResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ForecastResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_TopCityResponse proto.InternalMessageInfo
+var xxx_messageInfo_ForecastResponse proto.InternalMessageInfo
 
-func (m *TopCityResponse) GetResult() string {
+func (m *ForecastResponse) GetResult() string {
+	if m != nil {
+		return m.Result
+	}
+	return ""
+}
+
+type NowRequest struct {
+	Location string `protobuf:"bytes,1,opt,name=Location,json=location,proto3" json:"location,omitempty"`
+}
+
+func (m *NowRequest) Reset()         { *m = NowRequest{} }
+func (m *NowRequest) String() string { return proto.CompactTextString(m) }
+func (*NowRequest) ProtoMessage()    {}
+func (*NowRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecdc6c2fb8d35c9c, []int{2}
+}
+func (m *NowRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *NowRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_NowRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *NowRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NowRequest.Merge(m, src)
+}
+func (m *NowRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *NowRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_NowRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_NowRequest proto.InternalMessageInfo
+
+func (m *NowRequest) GetLocation() string {
+	if m != nil {
+		return m.Location
+	}
+	return ""
+}
+
+type NowResponse struct {
+	Result string `protobuf:"bytes,1,opt,name=Result,json=result,proto3" json:"result,omitempty"`
+}
+
+func (m *NowResponse) Reset()         { *m = NowResponse{} }
+func (m *NowResponse) String() string { return proto.CompactTextString(m) }
+func (*NowResponse) ProtoMessage()    {}
+func (*NowResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ecdc6c2fb8d35c9c, []int{3}
+}
+func (m *NowResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *NowResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_NowResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *NowResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NowResponse.Merge(m, src)
+}
+func (m *NowResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *NowResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_NowResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_NowResponse proto.InternalMessageInfo
+
+func (m *NowResponse) GetResult() string {
 	if m != nil {
 		return m.Result
 	}
@@ -104,14 +209,16 @@ func (m *TopCityResponse) GetResult() string {
 }
 
 type IndicesRequest struct {
-	Days int64 `protobuf:"varint,1,opt,name=Days,proto3" json:"days"`
+	Location string `protobuf:"bytes,1,opt,name=Location,json=location,proto3" json:"location,omitempty"`
+	Type     string `protobuf:"bytes,2,opt,name=Type,json=type,proto3" json:"type,omitempty"`
+	Duration string `protobuf:"bytes,3,opt,name=Duration,json=duration,proto3" json:"duration,omitempty"`
 }
 
 func (m *IndicesRequest) Reset()         { *m = IndicesRequest{} }
 func (m *IndicesRequest) String() string { return proto.CompactTextString(m) }
 func (*IndicesRequest) ProtoMessage()    {}
 func (*IndicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecdc6c2fb8d35c9c, []int{2}
+	return fileDescriptor_ecdc6c2fb8d35c9c, []int{4}
 }
 func (m *IndicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -140,22 +247,36 @@ func (m *IndicesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IndicesRequest proto.InternalMessageInfo
 
-func (m *IndicesRequest) GetDays() int64 {
+func (m *IndicesRequest) GetLocation() string {
 	if m != nil {
-		return m.Days
+		return m.Location
 	}
-	return 0
+	return ""
+}
+
+func (m *IndicesRequest) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+func (m *IndicesRequest) GetDuration() string {
+	if m != nil {
+		return m.Duration
+	}
+	return ""
 }
 
 type IndicesResponse struct {
-	Days int64 `protobuf:"varint,1,opt,name=Days,proto3" json:"days"`
+	Result string `protobuf:"bytes,1,opt,name=Result,json=result,proto3" json:"result,omitempty"`
 }
 
 func (m *IndicesResponse) Reset()         { *m = IndicesResponse{} }
 func (m *IndicesResponse) String() string { return proto.CompactTextString(m) }
 func (*IndicesResponse) ProtoMessage()    {}
 func (*IndicesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecdc6c2fb8d35c9c, []int{3}
+	return fileDescriptor_ecdc6c2fb8d35c9c, []int{5}
 }
 func (m *IndicesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -184,16 +305,18 @@ func (m *IndicesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_IndicesResponse proto.InternalMessageInfo
 
-func (m *IndicesResponse) GetDays() int64 {
+func (m *IndicesResponse) GetResult() string {
 	if m != nil {
-		return m.Days
+		return m.Result
 	}
-	return 0
+	return ""
 }
 
 func init() {
-	proto.RegisterType((*TopCityRequest)(nil), "proto.TopCityRequest")
-	proto.RegisterType((*TopCityResponse)(nil), "proto.TopCityResponse")
+	proto.RegisterType((*ForecastRequest)(nil), "proto.ForecastRequest")
+	proto.RegisterType((*ForecastResponse)(nil), "proto.ForecastResponse")
+	proto.RegisterType((*NowRequest)(nil), "proto.NowRequest")
+	proto.RegisterType((*NowResponse)(nil), "proto.NowResponse")
 	proto.RegisterType((*IndicesRequest)(nil), "proto.IndicesRequest")
 	proto.RegisterType((*IndicesResponse)(nil), "proto.IndicesResponse")
 }
@@ -201,28 +324,38 @@ func init() {
 func init() { proto.RegisterFile("proto/weather.proto", fileDescriptor_ecdc6c2fb8d35c9c) }
 
 var fileDescriptor_ecdc6c2fb8d35c9c = []byte{
-	// 276 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2e, 0x28, 0xca, 0x2f,
-	0xc9, 0xd7, 0x2f, 0x4f, 0x4d, 0x2c, 0xc9, 0x48, 0x2d, 0xd2, 0x03, 0xf3, 0x84, 0x58, 0xc1, 0x94,
-	0x94, 0x49, 0x7a, 0x66, 0x49, 0x46, 0x69, 0x92, 0x5e, 0x72, 0x7e, 0xae, 0x7e, 0x7a, 0x7e, 0x7a,
-	0xbe, 0x3e, 0x58, 0x38, 0xa9, 0x34, 0xcd, 0xa1, 0xcc, 0x50, 0xcf, 0x58, 0xcf, 0x08, 0x2c, 0x08,
-	0xd1, 0x0f, 0x62, 0x41, 0x34, 0x2b, 0x09, 0x70, 0xf1, 0x85, 0xe4, 0x17, 0x38, 0x67, 0x96, 0x54,
-	0x06, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x28, 0xd9, 0x73, 0xf1, 0xc3, 0x45, 0x8a, 0x0b, 0xf2,
-	0xf3, 0x8a, 0x53, 0x85, 0x74, 0xb8, 0xd8, 0x82, 0x52, 0x8b, 0x4b, 0x73, 0x4a, 0x24, 0x18, 0x15,
-	0x18, 0x35, 0x38, 0x9d, 0x44, 0x5e, 0xdd, 0x93, 0x17, 0x28, 0x02, 0x8b, 0xe8, 0xe4, 0xe7, 0x66,
-	0x96, 0xa4, 0xe6, 0x16, 0x94, 0x54, 0x06, 0x41, 0xd5, 0x28, 0xe9, 0x71, 0xf1, 0x79, 0xe6, 0xa5,
-	0x64, 0x26, 0xa7, 0x16, 0x43, 0x8d, 0x14, 0x92, 0xe1, 0x62, 0x71, 0x49, 0xac, 0x2c, 0x06, 0xeb,
-	0x66, 0x76, 0xe2, 0x78, 0x75, 0x4f, 0x9e, 0x25, 0x25, 0xb1, 0xb2, 0x38, 0x08, 0x2c, 0xaa, 0xa4,
-	0xcf, 0xc5, 0x0f, 0x57, 0x0f, 0xb5, 0x10, 0xaf, 0x06, 0xa3, 0x46, 0x46, 0x2e, 0xf6, 0x70, 0x48,
-	0x10, 0x08, 0x59, 0x71, 0xb1, 0x43, 0x35, 0x0b, 0x89, 0x42, 0xbc, 0xa4, 0x87, 0x6a, 0xb9, 0x94,
-	0x18, 0xba, 0x30, 0xc4, 0x0e, 0x25, 0x06, 0x90, 0x5e, 0xa8, 0x4f, 0xe1, 0x7a, 0x51, 0xc3, 0x02,
-	0xae, 0x17, 0x2d, 0x40, 0x94, 0x18, 0x9c, 0x24, 0x4e, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e,
-	0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8, 0xf1, 0x58,
-	0x8e, 0x21, 0x89, 0x0d, 0xac, 0xc5, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0xfe, 0xed, 0xcb, 0xc0,
-	0xac, 0x01, 0x00, 0x00,
+	// 437 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0x41, 0x8b, 0xd3, 0x40,
+	0x14, 0x80, 0x3b, 0xdd, 0xb5, 0x5b, 0x47, 0xd8, 0x5d, 0xc7, 0x75, 0xed, 0x06, 0x4d, 0x64, 0x14,
+	0x91, 0xa5, 0x24, 0xd8, 0x7a, 0xaa, 0x07, 0x4b, 0x11, 0x41, 0xd0, 0x1e, 0x8a, 0xe0, 0xc9, 0x43,
+	0x9a, 0x4e, 0xd3, 0x40, 0x9b, 0x17, 0x93, 0x89, 0x21, 0x57, 0x7f, 0x81, 0xe0, 0xcd, 0x93, 0x3f,
+	0xc7, 0x63, 0xc1, 0x8b, 0xa7, 0x22, 0xad, 0xa7, 0xfe, 0x0a, 0xc9, 0xcc, 0xa4, 0x4d, 0xdb, 0x8b,
+	0xb4, 0xa7, 0xc9, 0x7c, 0xbc, 0xf7, 0xbd, 0x37, 0x2f, 0x0f, 0xdf, 0x09, 0x42, 0xe0, 0x60, 0x25,
+	0xcc, 0xe6, 0x23, 0x16, 0x9a, 0xe2, 0x46, 0x6e, 0x88, 0x43, 0xbb, 0xef, 0x02, 0xb8, 0x63, 0x66,
+	0xd9, 0x81, 0x67, 0xd9, 0xbe, 0x0f, 0xdc, 0xe6, 0x1e, 0xf8, 0x91, 0x0c, 0xd2, 0x9e, 0xbb, 0x1e,
+	0x1f, 0xc5, 0x7d, 0xd3, 0x81, 0x89, 0xe5, 0x82, 0x0b, 0x96, 0xc0, 0xfd, 0x78, 0xd8, 0xfe, 0xfc,
+	0xcc, 0x6c, 0x9a, 0x0d, 0x01, 0xa5, 0x3d, 0xfb, 0x92, 0x59, 0x34, 0xc5, 0x67, 0xaf, 0x21, 0x64,
+	0x8e, 0x1d, 0xf1, 0x1e, 0xfb, 0x14, 0xb3, 0x88, 0x93, 0x06, 0xae, 0xbe, 0x05, 0x47, 0xb8, 0x6b,
+	0xe8, 0x21, 0x7a, 0x7a, 0xb3, 0x73, 0xb9, 0x9c, 0x19, 0x64, 0xac, 0x58, 0x1d, 0x26, 0x1e, 0x67,
+	0x93, 0x80, 0xa7, 0xbd, 0x6a, 0xce, 0xb2, 0x9c, 0x57, 0x71, 0x28, 0x73, 0xca, 0xeb, 0x9c, 0x81,
+	0x62, 0xc5, 0x9c, 0x9c, 0xd1, 0x36, 0x3e, 0x5f, 0x97, 0x8e, 0x02, 0xf0, 0x23, 0x46, 0xea, 0xb8,
+	0xd2, 0x63, 0x51, 0x3c, 0xe6, 0xaa, 0xf2, 0xc5, 0x72, 0x66, 0x9c, 0x87, 0x82, 0x14, 0x1c, 0x15,
+	0x49, 0x68, 0x1b, 0xe3, 0x2e, 0x24, 0x07, 0xf4, 0x4d, 0x5f, 0xe0, 0x5b, 0xc2, 0xb0, 0x57, 0xf9,
+	0x1f, 0x08, 0x9f, 0xbe, 0xf1, 0x07, 0x9e, 0xc3, 0xa2, 0x43, 0x66, 0xf7, 0x04, 0x1f, 0xbf, 0x4f,
+	0x03, 0xa6, 0xe6, 0x46, 0x96, 0x33, 0xe3, 0x94, 0xa7, 0x01, 0x2b, 0xc4, 0x1e, 0x67, 0xf7, 0x8d,
+	0x19, 0x1f, 0xfd, 0xe7, 0x8c, 0x5f, 0xe2, 0xb3, 0x55, 0x87, 0xfb, 0xbc, 0xb1, 0xf1, 0xbd, 0x8c,
+	0x4f, 0x3e, 0xc8, 0x65, 0x24, 0x1f, 0xf1, 0x89, 0x92, 0x91, 0xbb, 0x72, 0x7d, 0xcc, 0xcd, 0xe7,
+	0x6b, 0x97, 0xdb, 0x58, 0xd6, 0xa4, 0x8f, 0xbe, 0xfc, 0xfa, 0xfb, 0xad, 0xfc, 0x80, 0xd6, 0xf2,
+	0xc5, 0x5e, 0x9d, 0x9e, 0x8c, 0x6c, 0xa1, 0x6b, 0xf2, 0x0e, 0x1f, 0x75, 0x21, 0x21, 0xb7, 0x95,
+	0x63, 0xfd, 0x67, 0x35, 0x52, 0x44, 0x4a, 0x69, 0x08, 0xe5, 0x15, 0xbd, 0xd8, 0x51, 0xfa, 0x90,
+	0x64, 0x3a, 0x1b, 0x57, 0xf3, 0xf5, 0x22, 0x79, 0x5f, 0x5b, 0xab, 0xae, 0xdd, 0xdb, 0xe1, 0xca,
+	0xfe, 0x58, 0xd8, 0x75, 0x7a, 0xb5, 0x63, 0x1f, 0xaa, 0xd0, 0x16, 0xba, 0xee, 0xd4, 0x7e, 0xce,
+	0x75, 0x34, 0x9d, 0xeb, 0xe8, 0xcf, 0x5c, 0x47, 0x5f, 0x17, 0x7a, 0x69, 0xba, 0xd0, 0x4b, 0xbf,
+	0x17, 0x7a, 0xa9, 0x5f, 0x11, 0xde, 0xe6, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6f, 0x08, 0xc7,
+	0x16, 0xcf, 0x03, 0x00, 0x00,
 }
 
-func (m *TopCityRequest) Marshal() (dAtA []byte, err error) {
+func (m *ForecastRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -232,20 +365,34 @@ func (m *TopCityRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *TopCityRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *ForecastRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *TopCityRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ForecastRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if len(m.Duration) > 0 {
+		i -= len(m.Duration)
+		copy(dAtA[i:], m.Duration)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Duration)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Location) > 0 {
+		i -= len(m.Location)
+		copy(dAtA[i:], m.Location)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Location)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
-func (m *TopCityResponse) Marshal() (dAtA []byte, err error) {
+func (m *ForecastResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -255,12 +402,72 @@ func (m *TopCityResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *TopCityResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *ForecastResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *TopCityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ForecastResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Result) > 0 {
+		i -= len(m.Result)
+		copy(dAtA[i:], m.Result)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Result)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *NowRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *NowRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *NowRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Location) > 0 {
+		i -= len(m.Location)
+		copy(dAtA[i:], m.Location)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Location)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *NowResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *NowResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *NowResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -295,10 +502,26 @@ func (m *IndicesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Days != 0 {
-		i = encodeVarintWeather(dAtA, i, uint64(m.Days))
+	if len(m.Duration) > 0 {
+		i -= len(m.Duration)
+		copy(dAtA[i:], m.Duration)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Duration)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0x1a
+	}
+	if len(m.Type) > 0 {
+		i -= len(m.Type)
+		copy(dAtA[i:], m.Type)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Type)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Location) > 0 {
+		i -= len(m.Location)
+		copy(dAtA[i:], m.Location)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Location)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -323,10 +546,12 @@ func (m *IndicesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Days != 0 {
-		i = encodeVarintWeather(dAtA, i, uint64(m.Days))
+	if len(m.Result) > 0 {
+		i -= len(m.Result)
+		copy(dAtA[i:], m.Result)
+		i = encodeVarintWeather(dAtA, i, uint64(len(m.Result)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -342,16 +567,50 @@ func encodeVarintWeather(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *TopCityRequest) Size() (n int) {
+func (m *ForecastRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.Location)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
+	l = len(m.Duration)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
 	return n
 }
 
-func (m *TopCityResponse) Size() (n int) {
+func (m *ForecastResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Result)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
+	return n
+}
+
+func (m *NowRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Location)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
+	return n
+}
+
+func (m *NowResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -370,8 +629,17 @@ func (m *IndicesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Days != 0 {
-		n += 1 + sovWeather(uint64(m.Days))
+	l = len(m.Location)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
+	}
+	l = len(m.Duration)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
 	}
 	return n
 }
@@ -382,8 +650,9 @@ func (m *IndicesResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Days != 0 {
-		n += 1 + sovWeather(uint64(m.Days))
+	l = len(m.Result)
+	if l > 0 {
+		n += 1 + l + sovWeather(uint64(l))
 	}
 	return n
 }
@@ -394,7 +663,7 @@ func sovWeather(x uint64) (n int) {
 func sozWeather(x uint64) (n int) {
 	return sovWeather(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *TopCityRequest) Unmarshal(dAtA []byte) error {
+func (m *ForecastRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -417,12 +686,76 @@ func (m *TopCityRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: TopCityRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: ForecastRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TopCityRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ForecastRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Location = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Duration = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWeather(dAtA[iNdEx:])
@@ -444,7 +777,7 @@ func (m *TopCityRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *TopCityResponse) Unmarshal(dAtA []byte) error {
+func (m *ForecastResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -467,10 +800,174 @@ func (m *TopCityResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: TopCityResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: ForecastResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TopCityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ForecastResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Result = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipWeather(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NowRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowWeather
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NowRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NowRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Location = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipWeather(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NowResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowWeather
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NowResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NowResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -556,10 +1053,10 @@ func (m *IndicesRequest) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Days", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
 			}
-			m.Days = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowWeather
@@ -569,11 +1066,88 @@ func (m *IndicesRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Days |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Location = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWeather
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Duration = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWeather(dAtA[iNdEx:])
@@ -625,10 +1199,10 @@ func (m *IndicesResponse) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Days", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
-			m.Days = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowWeather
@@ -638,11 +1212,24 @@ func (m *IndicesResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Days |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWeather
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWeather
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Result = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWeather(dAtA[iNdEx:])
