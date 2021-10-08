@@ -24,7 +24,7 @@ func main() {
 	service.Init()
 
 	// Register Handlers
-	proto.RegisterWeatherHandler(service.Server(), new(handler.WeatherHandler))
+	proto.RegisterWeatherHandler(service.Server(), handler.NewWeatherHandler())
 
 	// Run server
 	if err := service.Run(); err != nil {

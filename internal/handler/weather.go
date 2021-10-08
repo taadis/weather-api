@@ -20,7 +20,7 @@ type WeatherHandler struct {
 	qweatherCredential *qweather.Credential
 }
 
-func NewWeatherHandler() *WeatherHandler {
+func NewWeatherHandler() proto.WeatherHandler {
 	h := new(WeatherHandler)
 	h.qweatherCredential = qweather.NewCredential(h.getPublicId(), h.getKey(), isBusiness) // 创建一个安全凭证
 	return h
