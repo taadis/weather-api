@@ -2,44 +2,70 @@ package handler
 
 import (
 	"context"
-	"log"
-	"os"
+	"encoding/json"
 
 	qweather "github.com/Ink-33/go-heweather/v7"
-	"github.com/taadis/weather-api/proto"
+	"github.com/micro/go-micro/errors"
+	"github.com/micro/go-micro/util/log"
+	"github.com/taadis/weather-api/internal/conf"
+	"github.com/taadis/weather-api/internal/model"
 )
 
 const (
-	QWEATHER_PUBLIC_ID = "QWEATHER_PUBLIC_ID"
-	QWEATHER_KEY       = "QWEATHER_KEY"
-	isBusiness         = false // 免费开发版为false，商业共享版与商业高性能版均为true
+	// 免费开发版为false，商业共享版与商业高性能版均为true
+	isBusiness = false
 )
 
-type WeatherHandler struct {
+var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试")
+
+type Weather struct {
 	qweatherCredential *qweather.Credential
 }
 
-func NewWeatherHandler() proto.WeatherHandler {
-	h := new(WeatherHandler)
-	h.qweatherCredential = qweather.NewCredential(h.getPublicId(), h.getKey(), isBusiness) // 创建一个安全凭证
+func NewWeather() *Weather {
+	h := new(Weather)
+	h.qweatherCredential = qweather.NewCredential(conf.GetPublicId(), conf.GetKey(), isBusiness) // 创建一个安全凭证
 	return h
 }
 
-func (h *WeatherHandler) getPublicId() string {
-	publicId := os.Getenv(QWEATHER_PUBLIC_ID)
-	return publicId
+func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
+	client := qweather.NewGeoTopCityClient()
+	result, err := client.Run(h.qweatherCredential, nil)
+	if err != nil {
+		log.Errorf("qweather.NewGeoTopCityClient client.Run topCity error: %v", err)
+		return err
+	}
+
+	err = json.Unmarshal([]byte(result), resp)
+	if err != nil {
+		log.Errorf("TopCity json.Unmarshal error:%v, result:%s", err, result)
+		return errJsonUnmarshal
+	}
+
+	return nil
 }
 
-func (h *WeatherHandler) getKey() string {
-	key := os.Getenv(QWEATHER_KEY)
-	return key
+func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, resp *model.LookupCityResponse) error {
+	client := qweather.NewGeoCityClient(req.Location)
+	lookupCityResp, err := client.Run(h.qweatherCredential, nil)
+	if err != nil {
+		log.Errorf("qweather.NewGeoCityClient client.Run lookupCity error: %v", err)
+		return err
+	}
+
+	err = json.Unmarshal([]byte(lookupCityResp), resp)
+	if err != nil {
+		return errJsonUnmarshal
+	}
+
+	return nil
 }
 
 // Indices 天气生活指数
-func (h *WeatherHandler) Indices(ctx context.Context, req *proto.IndicesRequest, resp *proto.IndicesResponse) error {
+func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
 	client, err := qweather.NewLiveIndexClient(req.Location, req.Type, req.Duration)
 	if err != nil {
-		log.Printf("qweather.NewLiveIndexClient errror:%v, req:%v", err, req)
+		log.Errorf("qweather.NewLiveIndexClient errror:%v, req:%v", err, req)
 		return err
 	}
 
@@ -47,41 +73,56 @@ func (h *WeatherHandler) Indices(ctx context.Context, req *proto.IndicesRequest,
 		Language: "cn",
 	})
 	if err != nil {
-		log.Printf("qweather.NewLiveIndexClient Run error:%v", err)
+		log.Errorf("qweather.NewLiveIndexClient Run error:%v", err)
 		return err
 	}
 
-	resp.Result = result
+	err = json.Unmarshal([]byte(result), resp)
+	if err != nil {
+		log.Errorf("Weather.Indices json.Unmarshal error:%v, result:%s", err, result)
+		return errJsonUnmarshal
+	}
+
 	return nil
 }
 
 // Now 实时天气
-func (h *WeatherHandler) Now(ctx context.Context, req *proto.NowRequest, resp *proto.NowResponse) error {
+func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
 	client := qweather.NewRealTimeWeatherClient(req.Location)
 	result, err := client.Run(h.qweatherCredential, nil)
 	if err != nil {
-		log.Printf("qweather.NewRealTimeWeatherClient Run error: %v", err)
+		log.Errorf("qweather.NewRealTimeWeatherClient Run error: %v", err)
 		return err
 	}
 
-	resp.Result = result
+	err = json.Unmarshal([]byte(result), resp)
+	if err != nil {
+		log.Errorf("Weather.Now json.Unmarshal error:%v, result:%s", err, result)
+		return errJsonUnmarshal
+	}
+
 	return nil
 }
 
 // Forecast 天气预报
-func (h *WeatherHandler) Forecast(ctx context.Context, req *proto.ForecastRequest, resp *proto.ForecastResponse) error {
+func (h *Weather) Forecast(ctx context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
 	client, err := qweather.NewWeatherForecastClient(req.Location, req.Duration)
 	if err != nil {
-		log.Printf("qweather.NewWeatherForecastClient error:%v, req:%+v", err, req)
+		log.Errorf("qweather.NewWeatherForecastClient error:%v, req:%+v", err, req)
 		return err
 	}
 
 	result, err := client.Run(h.qweatherCredential, nil)
 	if err != nil {
-		log.Printf("qweather.NewWeatherForecastClient Run error:%v, req:%+v", err, req)
+		log.Errorf("qweather.NewWeatherForecastClient Run error:%v, req:%+v", err, req)
 		return err
 	}
 
-	resp.Result = result
+	err = json.Unmarshal([]byte(result), resp)
+	if err != nil {
+		log.Errorf("Weather.Forecast json.Unmarshal error:%v, result:%s", result)
+		return errJsonUnmarshal
+	}
+
 	return nil
 }

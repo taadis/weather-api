@@ -5,53 +5,53 @@ package proto;
 import "google/api/annotations.proto";
 import "github.com/gogo/protobuf@v1.3.2/gogoproto/gogo.proto";
 
-service Weather {
-  // 天气生活指数
-  rpc Indices (IndicesRequest) returns (IndicesResponse) {
-    option (google.api.http) = {
-      post: "/weather/weather/indices"
-      body: "*"
-    };
-  };
-  // 实时天气
-  rpc Now (NowRequest) returns (NowResponse) {
-    option (google.api.http) = {
-      post: "/weather/weather/now"
-      body: "*"
-    };
-  };
-  // 天气预报
-  rpc Forecast (ForecastRequest) returns (ForecastResponse) {
-    option (google.api.http) = {
-      post: "/weather/weather/forecast"
-      body: "*"
-    };
-  };
-}
-
-message ForecastRequest {
-  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
-  string Duration = 2 [json_name = "duration", (gogoproto.jsontag) = "duration,omitempty"];
-}
-
-message ForecastResponse {
-  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
-}
-
-message NowRequest {
-  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
-}
-
-message NowResponse {
-  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
-}
-
-message IndicesRequest {
-  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
-  string Type = 2 [json_name = "type", (gogoproto.jsontag) = "type,omitempty"];
-  string Duration = 3 [json_name = "duration", (gogoproto.jsontag) = "duration,omitempty"];
-}
-
-message IndicesResponse {
-  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
-}
+//service Weather {
+//  // 天气生活指数
+//  rpc Indices (IndicesRequest) returns (IndicesResponse) {
+//    option (google.api.http) = {
+//      post: "/weather/weather/indices"
+//      body: "*"
+//    };
+//  };
+//  // 实时天气
+//  rpc Now (NowRequest) returns (NowResponse) {
+//    option (google.api.http) = {
+//      post: "/weather/weather/now"
+//      body: "*"
+//    };
+//  };
+//  // 天气预报
+//  rpc Forecast (ForecastRequest) returns (ForecastResponse) {
+//    option (google.api.http) = {
+//      post: "/weather/weather/forecast"
+//      body: "*"
+//    };
+//  };
+//}
+//
+//message ForecastRequest {
+//  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
+//  string Duration = 2 [json_name = "duration", (gogoproto.jsontag) = "duration,omitempty"];
+//}
+//
+//message ForecastResponse {
+//  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
+//}
+//
+//message NowRequest {
+//  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
+//}
+//
+//message NowResponse {
+//  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
+//}
+//
+//message IndicesRequest {
+//  string Location = 1 [json_name = "location", (gogoproto.jsontag) = "location,omitempty"];
+//  string Type = 2 [json_name = "type", (gogoproto.jsontag) = "type,omitempty"];
+//  string Duration = 3 [json_name = "duration", (gogoproto.jsontag) = "duration,omitempty"];
+//}
+//
+//message IndicesResponse {
+//  string Result = 1 [json_name = "result", (gogoproto.jsontag) = "result,omitempty"];
+//}
