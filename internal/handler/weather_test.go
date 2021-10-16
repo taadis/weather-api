@@ -28,6 +28,8 @@ func TestWeather_LookupCity(t *testing.T) {
 	req := &model.LookupCityRequest{
 		Location: "120.13026,30.25961",
 	}
+	req.Location = "西湖区"
+	req.Adm = "浙江省"
 	resp := &model.LookupCityResponse{}
 	err := weather.LookupCity(ctx, req, resp)
 	if err != nil {

@@ -49,14 +49,17 @@ func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *
 }
 
 func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, resp *model.LookupCityResponse) error {
-	client := qweather.NewGeoCityClient(req.Location)
-	lookupCityResp, err := client.Run(h.qweatherCredential, nil)
+	v2LookupCityReq := qweathersdk.NewV2LookupCityRequest()
+	v2LookupCityReq.Key = conf.GetKey()
+	v2LookupCityReq.Location = req.Location
+	v2LookupCityReq.Adm = req.Adm
+	v2LookupCityResp, err := h.qweatherClient.V2LookupCity(v2LookupCityReq)
 	if err != nil {
-		log.Errorf("qweather.NewGeoCityClient client.Run lookupCity error: %v", err)
+		log.Errorf("got V2LookupCity error: %v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(lookupCityResp), resp)
+	err = json.Unmarshal([]byte(v2LookupCityResp.String()), resp)
 	if err != nil {
 		return errJsonUnmarshal
 	}
