@@ -12,6 +12,7 @@ require (
 	github.com/miekg/dns v1.1.22 // indirect
 	github.com/nats-io/nats.go v1.9.1 // indirect
 	github.com/prometheus/procfs v0.0.5 // indirect
+	github.com/taadis/qweather-sdk-go v0.0.0-20211015125553-06d6c1b70ee0
 	go.uber.org/zap v1.12.0 // indirect
 	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
 	google.golang.org/grpc v1.25.1 // indirect

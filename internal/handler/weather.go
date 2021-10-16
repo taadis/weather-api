@@ -7,6 +7,7 @@ import (
 	qweather "github.com/Ink-33/go-heweather/v7"
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/util/log"
+	qweathersdk "github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/conf"
 	"github.com/taadis/weather-api/internal/model"
 )
@@ -20,25 +21,27 @@ var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试
 
 type Weather struct {
 	qweatherCredential *qweather.Credential
+	qweatherClient     *qweathersdk.Client
 }
 
 func NewWeather() *Weather {
 	h := new(Weather)
 	h.qweatherCredential = qweather.NewCredential(conf.GetPublicId(), conf.GetKey(), isBusiness) // 创建一个安全凭证
+	h.qweatherClient = qweathersdk.NewClient()
 	return h
 }
 
 func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
-	client := qweather.NewGeoTopCityClient()
-	result, err := client.Run(h.qweatherCredential, nil)
+	v2TopCityReq := qweathersdk.NewV2TopCityRequest()
+	v2TopCityReq.Key = conf.GetKey()
+	v2TopCityResp, err := h.qweatherClient.V2TopCity(v2TopCityReq)
 	if err != nil {
-		log.Errorf("qweather.NewGeoTopCityClient client.Run topCity error: %v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(result), resp)
+	err = json.Unmarshal([]byte(v2TopCityResp.String()), resp)
 	if err != nil {
-		log.Errorf("TopCity json.Unmarshal error:%v, result:%s", err, result)
+		log.Errorf("TopCity json.Unmarshal error:%v, result:%s", err, v2TopCityResp.String())
 		return errJsonUnmarshal
 	}
 
