@@ -91,16 +91,18 @@ func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest,
 
 // Now 实时天气
 func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
-	client := qweather.NewRealTimeWeatherClient(req.Location)
-	result, err := client.Run(h.qweatherCredential, nil)
+	v7WeatherNowReq := qweathersdk.NewV7WeatherNowRequest()
+	v7WeatherNowReq.Key = conf.GetKey()
+	v7WeatherNowReq.IsDev = true
+	v7WeatherNowReq.Location = req.Location
+	v7WeatherNowResp, err := h.qweatherClient.V7WeatherNow(v7WeatherNowReq)
 	if err != nil {
-		log.Errorf("qweather.NewRealTimeWeatherClient Run error: %v", err)
+		log.Errorf("got V7WeatherNow error:%v, req:%v", err, v7WeatherNowReq)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(result), resp)
+	err = json.Unmarshal([]byte(v7WeatherNowResp.String()), resp)
 	if err != nil {
-		log.Errorf("Weather.Now json.Unmarshal error:%v, result:%s", err, result)
 		return errJsonUnmarshal
 	}
 
