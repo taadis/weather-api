@@ -111,21 +111,19 @@ func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *m
 
 // Forecast 天气预报
 func (h *Weather) Forecast(ctx context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
-	client, err := qweather.NewWeatherForecastClient(req.Location, req.Duration)
+	v7WeatherDaysReq := qweathersdk.NewV7WeatherDaysRequest()
+	v7WeatherDaysReq.Key = conf.GetKey()
+	v7WeatherDaysReq.IsDev = true
+	v7WeatherDaysReq.Location = req.Location
+	v7WeatherDaysReq.Duration = req.Duration
+	v7WeatherDaysResp, err := h.qweatherClient.V7WeatherDays(v7WeatherDaysReq)
 	if err != nil {
-		log.Errorf("qweather.NewWeatherForecastClient error:%v, req:%+v", err, req)
+		log.Errorf("got V7WeatherDays error:%v, req:%v", err, v7WeatherDaysReq)
 		return err
 	}
 
-	result, err := client.Run(h.qweatherCredential, nil)
+	err = json.Unmarshal([]byte(v7WeatherDaysResp.String()), resp)
 	if err != nil {
-		log.Errorf("qweather.NewWeatherForecastClient Run error:%v, req:%+v", err, req)
-		return err
-	}
-
-	err = json.Unmarshal([]byte(result), resp)
-	if err != nil {
-		log.Errorf("Weather.Forecast json.Unmarshal error:%v, result:%s", result)
 		return errJsonUnmarshal
 	}
 
