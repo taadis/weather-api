@@ -69,23 +69,20 @@ func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, 
 
 // Indices 天气生活指数
 func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
-	client, err := qweather.NewLiveIndexClient(req.Location, req.Type, req.Duration)
+	v7IndicesReq := qweathersdk.NewV7IndicesRequest()
+	v7IndicesReq.Key = conf.GetKey()
+	v7IndicesReq.IsDev = true
+	v7IndicesReq.Location = req.Location
+	v7IndicesReq.Type = req.Type
+	v7IndicesReq.Duration = req.Duration
+	v7IndicesResp, err := h.qweatherClient.V7Indices(v7IndicesReq)
 	if err != nil {
-		log.Errorf("qweather.NewLiveIndexClient errror:%v, req:%v", err, req)
+		log.Errorf("got V7Indices error:%v, req:%v", err, v7IndicesReq)
 		return err
 	}
 
-	result, err := client.Run(h.qweatherCredential, &qweather.ClientConfig{
-		Language: "cn",
-	})
+	err = json.Unmarshal([]byte(v7IndicesResp.String()), resp)
 	if err != nil {
-		log.Errorf("qweather.NewLiveIndexClient Run error:%v", err)
-		return err
-	}
-
-	err = json.Unmarshal([]byte(result), resp)
-	if err != nil {
-		log.Errorf("Weather.Indices json.Unmarshal error:%v, result:%s", err, result)
 		return errJsonUnmarshal
 	}
 
