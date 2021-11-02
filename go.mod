@@ -9,7 +9,6 @@ require (
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/lucas-clemente/quic-go v0.13.1 // indirect
 	github.com/micro/go-micro v1.16.0
-	github.com/miekg/dns v1.1.22 // indirect
 	github.com/nats-io/nats.go v1.9.1 // indirect
 	github.com/prometheus/procfs v0.0.5 // indirect
 	github.com/taadis/qweather-sdk-go v0.0.0-20211102163707-3734147cf214
