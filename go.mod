@@ -3,7 +3,7 @@ module github.com/taadis/weather-api
 go 1.14
 
 require (
-	github.com/Ink-33/go-heweather v0.1.2
+	//github.com/Ink-33/go-heweather v0.1.2
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.3.2
 	github.com/json-iterator/go v1.1.8 // indirect

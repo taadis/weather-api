@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	qweather "github.com/Ink-33/go-heweather/v7"
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/util/log"
 	qweathersdk "github.com/taadis/qweather-sdk-go"
@@ -12,21 +11,14 @@ import (
 	"github.com/taadis/weather-api/internal/model"
 )
 
-const (
-	// 免费开发版为false，商业共享版与商业高性能版均为true
-	isBusiness = false
-)
-
 var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试")
 
 type Weather struct {
-	qweatherCredential *qweather.Credential
-	qweatherClient     *qweathersdk.Client
+	qweatherClient *qweathersdk.Client
 }
 
 func NewWeather() *Weather {
 	h := new(Weather)
-	h.qweatherCredential = qweather.NewCredential(conf.GetPublicId(), conf.GetKey(), isBusiness) // 创建一个安全凭证
 	h.qweatherClient = qweathersdk.NewClient()
 	return h
 }
