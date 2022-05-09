@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/alicebob/miniredis/v2"
+	"github.com/go-redis/redis/v8"
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/util/log"
 	qweathersdk "github.com/taadis/qweather-sdk-go"
+	"github.com/taadis/weather-api/internal/cache"
 	"github.com/taadis/weather-api/internal/conf"
 	"github.com/taadis/weather-api/internal/model"
 )
@@ -15,15 +18,39 @@ var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试
 
 type Weather struct {
 	qweatherClient *qweathersdk.Client
+	cache          *cache.Cache
 }
 
 func NewWeather() *Weather {
 	h := new(Weather)
 	h.qweatherClient = qweathersdk.NewClient()
+	mockRedis, _ := miniredis.Run()
+	rdbOpts := &redis.Options{
+		Addr:     mockRedis.Addr(),
+		Password: "",
+		DB:       0,
+	}
+	h.cache = cache.NewCache(redis.NewClient(rdbOpts))
 	return h
 }
 
 func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
+	s, err := h.cache.GetTopCityWithSet(ctx)
+	if err != nil {
+		log.Errorf("TopCity cache.GetTopCityWithSet error:%+v", err)
+		return err
+	}
+
+	err = json.Unmarshal([]byte(s), resp)
+	if err != nil {
+		log.Errorf("TopCity json.Unmarshal error:%v, s:%s", err, s)
+		return errJsonUnmarshal
+	}
+
+	return nil
+}
+
+func (h *Weather) TopCityWithoutCache(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
 	v2TopCityReq := qweathersdk.NewV2TopCityRequest()
 	v2TopCityReq.Key = conf.GetKey()
 	v2TopCityResp, err := h.qweatherClient.V2TopCity(v2TopCityReq)

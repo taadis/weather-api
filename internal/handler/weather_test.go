@@ -21,6 +21,14 @@ func TestWeather_TopCity(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("%+v", resp)
+
+	req = &model.TopCityRequest{}
+	resp = &model.TopCityResponse{}
+	err = weather.TopCityWithoutCache(ctx, req, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%+v", resp)
 }
 
 // 测试城市信息查询
