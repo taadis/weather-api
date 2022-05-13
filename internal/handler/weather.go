@@ -82,19 +82,18 @@ func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest,
 }
 
 // Now 实时天气
-func (h *Weather) Now(_ context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
-	v7WeatherNowReq := weatherSdk.NewV7WeatherNowRequest()
-	v7WeatherNowReq.Key = conf.GetKey()
-	v7WeatherNowReq.IsDev = true
-	v7WeatherNowReq.Location = req.Location
-	v7WeatherNowResp, err := h.weatherClient.V7WeatherNow(v7WeatherNowReq)
+func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
+	key := new(NowKey)
+	key.Location = req.Location
+	s, err := h.weatherCache.GetSetNow(ctx, key)
 	if err != nil {
-		log.Errorf("got V7WeatherNow error:%v, req:%v", err, v7WeatherNowReq)
+		log.Errorf("Now cache.GetSetNow error:%+v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(v7WeatherNowResp.String()), resp)
+	err = json.Unmarshal([]byte(s), resp)
 	if err != nil {
+		log.Errorf("Now json.Unmarshal error:%+v,s:%s", s)
 		return errJsonUnmarshal
 	}
 

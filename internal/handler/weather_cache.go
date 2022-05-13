@@ -17,6 +17,7 @@ const (
 	KeyTopCity        = "top-city"
 	KeyLookupCity     = "lookup-city-location-%s-adm-%s"
 	KeyIndices        = "indices-location-%s-type-%s-duration-%s"
+	KeyNow            = "now-location-%s"
 )
 
 type IWeatherCache interface {
@@ -29,6 +30,9 @@ type IWeatherCache interface {
 	SetIndices(ctx context.Context, key string, value string) error
 	GetIndices(ctx context.Context, key string) (string, error)
 	GetSetIndices(ctx context.Context, key *IndicesKey) (string, error)
+	SetNow(ctx context.Context, key string, value string) error
+	GetNow(ctx context.Context, key string) (string, error)
+	GetSetNow(ctx context.Context, key *NowKey) (string, error)
 }
 
 type WeatherCache struct {
@@ -169,6 +173,50 @@ func (c *WeatherCache) GetSetIndices(ctx context.Context, key *IndicesKey) (stri
 			return s, nil
 		}
 		log.Errorf("cache.GetIndices error:%+v,key=%s", ky)
+		return "", err
+	}
+	return s, nil
+}
+
+type NowKey struct {
+	Location string
+}
+
+func (c *WeatherCache) SetNow(ctx context.Context, key string, value string) error {
+	return c.cache.Set(ctx, key, value, defaultExpiration)
+}
+
+func (c *WeatherCache) GetNow(ctx context.Context, key string) (string, error) {
+	return c.cache.Get(ctx, key)
+}
+
+func (c *WeatherCache) GetSetNow(ctx context.Context, key *NowKey) (string, error) {
+	ky := cache.BuildKey(KeyNow, key.Location)
+	s, err := c.GetNow(ctx, ky)
+	if err != nil {
+		if cache.IsNil(err) {
+			log.Infof("cache.GetNow is nil,key=%s", ky)
+			v7WeatherNowReq := weatherSdk.NewV7WeatherNowRequest()
+			v7WeatherNowReq.Key = conf.GetKey()
+			v7WeatherNowReq.IsDev = true
+			v7WeatherNowReq.Location = key.Location
+			v7WeatherNowResp, err := c.weatherClient.V7WeatherNow(v7WeatherNowReq)
+			if err != nil {
+				log.Errorf("got V7WeatherNow error:%v, req:%v", err, v7WeatherNowReq)
+				return "", err
+			}
+
+			s = v7WeatherNowResp.String()
+			err = c.SetNow(ctx, ky, s)
+			if err != nil {
+				log.Errorf("cache.SetNow error:%+v,key=%s,value=%s", err, ky, s)
+				return "", err
+			}
+
+			return s, nil
+		}
+
+		log.Errorf("cache.GetNow error:%+v,key=%s", err, ky)
 		return "", err
 	}
 	return s, nil
