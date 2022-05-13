@@ -6,21 +6,17 @@ import (
 
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/util/log"
-	weatherSdk "github.com/taadis/qweather-sdk-go"
-	"github.com/taadis/weather-api/internal/conf"
 	"github.com/taadis/weather-api/internal/model"
 )
 
 var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试")
 
 type Weather struct {
-	weatherClient *weatherSdk.Client
-	weatherCache  IWeatherCache
+	weatherCache IWeatherCache
 }
 
 func NewWeather() *Weather {
 	h := new(Weather)
-	h.weatherClient = weatherSdk.NewClient()
 	h.weatherCache = NewWeatherCache()
 	return h
 }
@@ -101,20 +97,19 @@ func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *m
 }
 
 // Forecast 天气预报
-func (h *Weather) Forecast(_ context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
-	v7WeatherDaysReq := weatherSdk.NewV7WeatherDaysRequest()
-	v7WeatherDaysReq.Key = conf.GetKey()
-	v7WeatherDaysReq.IsDev = true
-	v7WeatherDaysReq.Location = req.Location
-	v7WeatherDaysReq.Duration = req.Duration
-	v7WeatherDaysResp, err := h.weatherClient.V7WeatherDays(v7WeatherDaysReq)
+func (h *Weather) Forecast(ctx context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
+	key := new(ForecastKey)
+	key.Location = req.Location
+	key.Duration = req.Duration
+	s, err := h.weatherCache.GetSetForecast(ctx, key)
 	if err != nil {
-		log.Errorf("got V7WeatherDays error:%v, req:%v", err, v7WeatherDaysReq)
+		log.Errorf("Forecast cache.GetSetForecast error:%+v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(v7WeatherDaysResp.String()), resp)
+	err = json.Unmarshal([]byte(s), resp)
 	if err != nil {
+		log.Errorf("Forecast json.Unmarshal error:%+v,s:%s", err, s)
 		return errJsonUnmarshal
 	}
 

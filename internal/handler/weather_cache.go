@@ -18,6 +18,7 @@ const (
 	KeyLookupCity     = "lookup-city-location-%s-adm-%s"
 	KeyIndices        = "indices-location-%s-type-%s-duration-%s"
 	KeyNow            = "now-location-%s"
+	KeyForecast       = "forecast-location-%s-duration-%s"
 )
 
 type IWeatherCache interface {
@@ -33,6 +34,9 @@ type IWeatherCache interface {
 	SetNow(ctx context.Context, key string, value string) error
 	GetNow(ctx context.Context, key string) (string, error)
 	GetSetNow(ctx context.Context, key *NowKey) (string, error)
+	SetForecast(ctx context.Context, key string, value string) error
+	GetForecast(ctx context.Context, key string) (string, error)
+	GetSetForecast(ctx context.Context, key *ForecastKey) (string, error)
 }
 
 type WeatherCache struct {
@@ -219,5 +223,52 @@ func (c *WeatherCache) GetSetNow(ctx context.Context, key *NowKey) (string, erro
 		log.Errorf("cache.GetNow error:%+v,key=%s", err, ky)
 		return "", err
 	}
+	return s, nil
+}
+
+type ForecastKey struct {
+	Location string
+	Duration string
+}
+
+func (c *WeatherCache) SetForecast(ctx context.Context, key string, value string) error {
+	return c.cache.Set(ctx, key, value, defaultExpiration)
+}
+
+func (c *WeatherCache) GetForecast(ctx context.Context, key string) (string, error) {
+	return c.cache.Get(ctx, key)
+}
+
+func (c *WeatherCache) GetSetForecast(ctx context.Context, key *ForecastKey) (string, error) {
+	ky := cache.BuildKey(KeyForecast, key.Location, key.Duration)
+	s, err := c.GetForecast(ctx, ky)
+	if err != nil {
+		if cache.IsNil(err) {
+			log.Infof("cache.GetForecast is nil,key=%s", ky)
+			v7WeatherDaysReq := weatherSdk.NewV7WeatherDaysRequest()
+			v7WeatherDaysReq.Key = conf.GetKey()
+			v7WeatherDaysReq.IsDev = true
+			v7WeatherDaysReq.Location = key.Location
+			v7WeatherDaysReq.Duration = key.Duration
+			v7WeatherDaysResp, err := c.weatherClient.V7WeatherDays(v7WeatherDaysReq)
+			if err != nil {
+				log.Errorf("got V7WeatherDays error:%v, req:%v", err, v7WeatherDaysReq)
+				return "", err
+			}
+
+			s = v7WeatherDaysResp.String()
+			err = c.SetForecast(ctx, ky, s)
+			if err != nil {
+				log.Errorf("cache.SetForecast error:%+v,key=%s,value=%s", err, ky, s)
+				return "", err
+			}
+
+			return s, nil
+		}
+
+		log.Errorf("cache.GetForecast error:%+v,key=%s", err, ky)
+		return "", err
+	}
+
 	return s, nil
 }
