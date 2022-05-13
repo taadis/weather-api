@@ -61,21 +61,20 @@ func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, 
 }
 
 // Indices 天气生活指数
-func (h *Weather) Indices(_ context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
-	v7IndicesReq := weatherSdk.NewV7IndicesRequest()
-	v7IndicesReq.Key = conf.GetKey()
-	v7IndicesReq.IsDev = true
-	v7IndicesReq.Location = req.Location
-	v7IndicesReq.Type = req.Type
-	v7IndicesReq.Duration = req.Duration
-	v7IndicesResp, err := h.weatherClient.V7Indices(v7IndicesReq)
+func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
+	key := new(IndicesKey)
+	key.Location = req.Location
+	key.Type = req.Type
+	key.Duration = req.Duration
+	s, err := h.weatherCache.GetSetIndices(ctx, key)
 	if err != nil {
-		log.Errorf("got V7Indices error:%v, req:%v", err, v7IndicesReq)
+		log.Errorf("Indices cache.GetSetIndices error:%+v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(v7IndicesResp.String()), resp)
+	err = json.Unmarshal([]byte(s), resp)
 	if err != nil {
+		log.Errorf("Indices json.Unmarshal error:%+v", err)
 		return errJsonUnmarshal
 	}
 
