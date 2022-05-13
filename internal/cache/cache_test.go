@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
@@ -26,34 +27,67 @@ func TestMain(m *testing.M) {
 	})
 	cacheClient = NewCache(rdb)
 	m.Run()
+	rdb.Close()
 }
 
-func TestCache_GetTopCity(t *testing.T) {
-	s, err := cacheClient.GetTopCity(ctx)
+func TestCache_Set(t *testing.T) {
+	err := cacheClient.Set(ctx, "key1", "value1", 3*time.Second)
 	if err != nil {
-		if err == redis.Nil {
-			t.Logf("cacheClient.GetTopCity result is nil")
+		t.Logf("cache set error:%+v", err)
+	}
+}
+
+func TestCache_Get(t *testing.T) {
+	s, err := cacheClient.Get(ctx, "key1")
+	if err != nil {
+		if IsNil(err) {
+			t.Logf("cache get key1 is nil")
 			return
 		}
-		t.Fatalf("cacheClient.GetTopCity error:%+v", err)
+		t.Fatalf("cache get key1 error:%+v", err)
 	}
 
-	t.Logf("cacheClient.GetTopCity result:%s", s)
+	t.Logf("cache get key1:%s", s)
 }
 
-func TestCache_SetTopCity(t *testing.T) {
-	value := "xxx"
-	err := cacheClient.SetTopCity(ctx, value)
+func TestCache_Delete(t *testing.T) {
+	err := cacheClient.Del(ctx, "key1")
 	if err != nil {
-		t.Fatalf("cacheClient.SetTopCity error:%+v", err)
+		t.Fatalf("cache delete key1 error:%+v", err)
 	}
 }
 
-func TestCache_GetTopCityWithSet(t *testing.T) {
-	s, err := cacheClient.GetTopCityWithSet(ctx)
-	if err != nil {
-		t.Fatalf("cacheClient.GetTopCityWithSet error:%+v", err)
-	}
-
-	t.Logf("cacheClient.GetTopCityWithSet result:%s", s)
+func TestCache(t *testing.T) {
+	key := "key1"
+	t.Run("KeyNotFound", func(t *testing.T) {
+		_, err := cacheClient.Get(ctx, key)
+		if !IsNil(err) {
+			t.Fatal(err)
+		}
+	})
+	t.Run("Set", func(t *testing.T) {
+		err := cacheClient.Set(ctx, key, "value1", time.Second)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	t.Run("Get", func(t *testing.T) {
+		value, err := cacheClient.Get(ctx, key)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("cache get %s=%s", key, value)
+	})
+	t.Run("Delete", func(t *testing.T) {
+		err := cacheClient.Del(ctx, key)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	t.Run("Deleted", func(t *testing.T) {
+		_, err := cacheClient.Get(ctx, key)
+		if !IsNil(err) {
+			t.Fatal(err)
+		}
+	})
 }

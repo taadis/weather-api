@@ -2,20 +2,18 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/micro/go-micro/util/log"
-	qWeather "github.com/taadis/qweather-sdk-go"
-	"github.com/taadis/weather-api/internal/conf"
-)
-
-const (
-	keyTopCity = "top-city"
 )
 
 type Cache struct {
 	rdb *redis.Client
+}
+
+func BuildKey(format string, a ...interface{}) string {
+	return fmt.Sprintf(format, a...)
 }
 
 func IsNil(err error) bool {
@@ -32,44 +30,14 @@ func NewCache(rdb *redis.Client) *Cache {
 	return c
 }
 
-func (c *Cache) SetTopCity(ctx context.Context, value string) error {
-	err := c.rdb.Set(ctx, keyTopCity, value, 10*time.Minute).Err()
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (c *Cache) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+	return c.rdb.Set(ctx, key, value, expiration).Err()
 }
 
-func (c *Cache) GetTopCity(ctx context.Context) (string, error) {
-	s, err := c.rdb.Get(ctx, keyTopCity).Result()
-	if err != nil {
-		return "", err
-	}
-
-	return s, nil
+func (c *Cache) Get(ctx context.Context, key string) (string, error) {
+	return c.rdb.Get(ctx, key).Result()
 }
 
-func (c *Cache) GetTopCityWithSet(ctx context.Context) (string, error) {
-	s, err := c.GetTopCity(ctx)
-	if err != nil {
-		if IsNil(err) {
-			log.Logf("cache.GetTopCity is nil")
-			v2TopCityReq := qWeather.NewV2TopCityRequest()
-			v2TopCityReq.Key = conf.GetKey()
-			v2TopCityResp, err := qWeather.NewClient().V2TopCity(v2TopCityReq)
-			if err != nil {
-				log.Errorf("V2TopCity error:%+v", err)
-				return "", err
-			}
-			s = v2TopCityResp.String()
-			err = c.SetTopCity(ctx, s)
-			if err != nil {
-				return "", err
-			}
-			return s, nil
-		}
-		log.Errorf("cache.GetTopCity error:%+v", err)
-	}
-	return s, nil
+func (c *Cache) Del(ctx context.Context, key string) error {
+	return c.rdb.Del(ctx, key).Err()
 }

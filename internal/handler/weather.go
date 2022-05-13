@@ -4,12 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v8"
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/util/log"
 	qweathersdk "github.com/taadis/qweather-sdk-go"
-	"github.com/taadis/weather-api/internal/cache"
 	"github.com/taadis/weather-api/internal/conf"
 	"github.com/taadis/weather-api/internal/model"
 )
@@ -18,49 +15,26 @@ var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试
 
 type Weather struct {
 	qweatherClient *qweathersdk.Client
-	cache          *cache.Cache
+	weatherCache   IWeatherCache
 }
 
 func NewWeather() *Weather {
 	h := new(Weather)
 	h.qweatherClient = qweathersdk.NewClient()
-	mockRedis, _ := miniredis.Run()
-	rdbOpts := &redis.Options{
-		Addr:     mockRedis.Addr(),
-		Password: "",
-		DB:       0,
-	}
-	h.cache = cache.NewCache(redis.NewClient(rdbOpts))
+	h.weatherCache = NewWeatherCache()
 	return h
 }
 
 func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
-	s, err := h.cache.GetTopCityWithSet(ctx)
+	s, err := h.weatherCache.GetSetTopCity(ctx)
 	if err != nil {
-		log.Errorf("TopCity cache.GetTopCityWithSet error:%+v", err)
+		log.Errorf("TopCity cache.GetSetTopCity error:%+v", err)
 		return err
 	}
 
 	err = json.Unmarshal([]byte(s), resp)
 	if err != nil {
-		log.Errorf("TopCity json.Unmarshal error:%v, s:%s", err, s)
-		return errJsonUnmarshal
-	}
-
-	return nil
-}
-
-func (h *Weather) TopCityWithoutCache(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
-	v2TopCityReq := qweathersdk.NewV2TopCityRequest()
-	v2TopCityReq.Key = conf.GetKey()
-	v2TopCityResp, err := h.qweatherClient.V2TopCity(v2TopCityReq)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal([]byte(v2TopCityResp.String()), resp)
-	if err != nil {
-		log.Errorf("TopCity json.Unmarshal error:%v, result:%s", err, v2TopCityResp.String())
+		log.Errorf("TopCity json.Unmarshal error:%+v, s:%s", err, s)
 		return errJsonUnmarshal
 	}
 
@@ -68,18 +42,18 @@ func (h *Weather) TopCityWithoutCache(ctx context.Context, req *model.TopCityReq
 }
 
 func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, resp *model.LookupCityResponse) error {
-	v2LookupCityReq := qweathersdk.NewV2LookupCityRequest()
-	v2LookupCityReq.Key = conf.GetKey()
-	v2LookupCityReq.Location = req.Location
-	v2LookupCityReq.Adm = req.Adm
-	v2LookupCityResp, err := h.qweatherClient.V2LookupCity(v2LookupCityReq)
+	key := new(LookupCityKey)
+	key.Location = req.Location
+	key.Adm = req.Adm
+	s, err := h.weatherCache.GetSetLookupCity(ctx, key)
 	if err != nil {
-		log.Errorf("got V2LookupCity error: %v", err)
+		log.Errorf("LookupCity cache.GetSetLookupCity error:%+v", err)
 		return err
 	}
 
-	err = json.Unmarshal([]byte(v2LookupCityResp.String()), resp)
+	err = json.Unmarshal([]byte(s), resp)
 	if err != nil {
+		log.Errorf("LookupCity json.Unmarshal error:%+v", err)
 		return errJsonUnmarshal
 	}
 
