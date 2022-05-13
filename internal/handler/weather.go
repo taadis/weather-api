@@ -25,7 +25,7 @@ func NewWeather() *Weather {
 	return h
 }
 
-func (h *Weather) TopCity(ctx context.Context, req *model.TopCityRequest, resp *model.TopCityResponse) error {
+func (h *Weather) TopCity(ctx context.Context, _ *model.TopCityRequest, resp *model.TopCityResponse) error {
 	s, err := h.weatherCache.GetSetTopCity(ctx)
 	if err != nil {
 		log.Errorf("TopCity cache.GetSetTopCity error:%+v", err)
@@ -61,7 +61,7 @@ func (h *Weather) LookupCity(ctx context.Context, req *model.LookupCityRequest, 
 }
 
 // Indices 天气生活指数
-func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
+func (h *Weather) Indices(_ context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error {
 	v7IndicesReq := weatherSdk.NewV7IndicesRequest()
 	v7IndicesReq.Key = conf.GetKey()
 	v7IndicesReq.IsDev = true
@@ -83,7 +83,7 @@ func (h *Weather) Indices(ctx context.Context, req *model.WeatherIndicesRequest,
 }
 
 // Now 实时天气
-func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
+func (h *Weather) Now(_ context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error {
 	v7WeatherNowReq := weatherSdk.NewV7WeatherNowRequest()
 	v7WeatherNowReq.Key = conf.GetKey()
 	v7WeatherNowReq.IsDev = true
@@ -103,7 +103,7 @@ func (h *Weather) Now(ctx context.Context, req *model.WeatherNowRequest, resp *m
 }
 
 // Forecast 天气预报
-func (h *Weather) Forecast(ctx context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
+func (h *Weather) Forecast(_ context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error {
 	v7WeatherDaysReq := weatherSdk.NewV7WeatherDaysRequest()
 	v7WeatherDaysReq.Key = conf.GetKey()
 	v7WeatherDaysReq.IsDev = true
