@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v8"
 	"github.com/micro/go-micro/util/log"
 	weatherSdk "github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/cache"
@@ -40,20 +38,14 @@ type IWeatherCache interface {
 }
 
 type WeatherCache struct {
-	cache         *cache.Cache
+	cache         cache.ICache
 	weatherClient *weatherSdk.Client
 }
 
-func NewWeatherCache() *WeatherCache {
+func NewWeatherCache(cache cache.ICache, weatherClient *weatherSdk.Client) *WeatherCache {
 	c := new(WeatherCache)
-	c.weatherClient = weatherSdk.NewClient()
-	mockRedis, _ := miniredis.Run()
-	rdbOptions := &redis.Options{
-		Addr:     mockRedis.Addr(),
-		Password: "",
-		DB:       0,
-	}
-	c.cache = cache.NewCache(redis.NewClient(rdbOptions))
+	c.cache = cache
+	c.weatherClient = weatherClient
 	return c
 }
 

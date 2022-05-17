@@ -9,7 +9,7 @@ import (
 
 var (
 	ctx     = context.Background()
-	weather = NewWeather()
+	weather IWeather
 )
 
 // 测试热门城市

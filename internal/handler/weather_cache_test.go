@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/alicebob/miniredis/v2"
+	"github.com/go-redis/redis/v8"
+	"github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/cache"
 )
 
@@ -13,7 +16,19 @@ var (
 
 func TestMain(m *testing.M) {
 	ctx = context.Background()
-	weatherCache = NewWeatherCache()
+	mockRedis, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     mockRedis.Addr(),
+		Password: "",
+		DB:       0,
+	})
+	cache := cache.NewCache(rdb)
+	weatherClient := qweather.NewClient()
+	weatherCache = NewWeatherCache(cache, weatherClient)
+	weather = NewWeather(weatherCache)
 	m.Run()
 }
 

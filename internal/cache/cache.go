@@ -8,8 +8,20 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+type ICache interface {
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+	Del(ctx context.Context, key string) error
+}
+
 type Cache struct {
-	rdb *redis.Client
+	*redis.Client
+}
+
+func NewCache(rdb *redis.Client) *Cache {
+	c := new(Cache)
+	c.Client = rdb
+	return c
 }
 
 func BuildKey(format string, a ...interface{}) string {
@@ -24,20 +36,14 @@ func IsNil(err error) bool {
 	return false
 }
 
-func NewCache(rdb *redis.Client) *Cache {
-	c := new(Cache)
-	c.rdb = rdb
-	return c
-}
-
 func (c *Cache) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
-	return c.rdb.Set(ctx, key, value, expiration).Err()
+	return c.Client.Set(ctx, key, value, expiration).Err()
 }
 
 func (c *Cache) Get(ctx context.Context, key string) (string, error) {
-	return c.rdb.Get(ctx, key).Result()
+	return c.Client.Get(ctx, key).Result()
 }
 
 func (c *Cache) Del(ctx context.Context, key string) error {
-	return c.rdb.Del(ctx, key).Err()
+	return c.Client.Del(ctx, key).Err()
 }

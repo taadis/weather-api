@@ -11,13 +11,21 @@ import (
 
 var errJsonUnmarshal = errors.InternalServerError("", "序列化失败,请重试")
 
+type IWeather interface {
+	TopCity(ctx context.Context, _ *model.TopCityRequest, resp *model.TopCityResponse) error
+	LookupCity(ctx context.Context, req *model.LookupCityRequest, resp *model.LookupCityResponse) error
+	Indices(ctx context.Context, req *model.WeatherIndicesRequest, resp *model.WeatherIndicesResponse) error
+	Now(ctx context.Context, req *model.WeatherNowRequest, resp *model.WeatherNowResponse) error
+	Forecast(ctx context.Context, req *model.WeatherForecastRequest, resp *model.WeatherForecastResponse) error
+}
+
 type Weather struct {
 	weatherCache IWeatherCache
 }
 
-func NewWeather() *Weather {
+func NewWeather(weatherCache IWeatherCache) IWeather {
 	h := new(Weather)
-	h.weatherCache = NewWeatherCache()
+	h.weatherCache = weatherCache
 	return h
 }
 
