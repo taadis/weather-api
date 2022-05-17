@@ -50,7 +50,7 @@ func NewWeatherCache(cache cache.ICache, weatherClient *weatherSdk.Client) *Weat
 }
 
 func (c *WeatherCache) SetTopCity(ctx context.Context, value string) error {
-	return c.cache.Set(ctx, KeyLookupCity, value, 10*time.Minute)
+	return c.cache.Set(ctx, KeyTopCity, value, defaultExpiration)
 }
 
 func (c *WeatherCache) GetTopCity(ctx context.Context) (string, error) {
