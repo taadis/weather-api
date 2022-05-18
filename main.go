@@ -13,6 +13,7 @@ import (
 	weatherSdk "github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/cache"
 	"github.com/taadis/weather-api/internal/handler"
+	"github.com/taadis/weather-api/internal/lock"
 )
 
 func main() {
@@ -30,7 +31,8 @@ func main() {
 	})
 
 	iCache := cache.NewCache(rdb)
-	iWeatherCache := handler.NewWeatherCache(iCache, weatherSdk.NewClient())
+	locker := lock.NewLockRedis(rdb)
+	iWeatherCache := handler.NewWeatherCache(iCache, weatherSdk.NewClient(), locker)
 
 	service := micro.NewService(
 		micro.BeforeStart(func() error {

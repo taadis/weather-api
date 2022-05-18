@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/micro/go-micro/util/log"
 	weatherSdk "github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/cache"
 	"github.com/taadis/weather-api/internal/conf"
+	"github.com/taadis/weather-api/internal/lock"
 )
 
 const (
@@ -40,12 +42,14 @@ type IWeatherCache interface {
 type WeatherCache struct {
 	cache         cache.ICache
 	weatherClient *weatherSdk.Client
+	locker        lock.Locker
 }
 
-func NewWeatherCache(cache cache.ICache, weatherClient *weatherSdk.Client) *WeatherCache {
+func NewWeatherCache(cache cache.ICache, weatherClient *weatherSdk.Client, locker lock.Locker) *WeatherCache {
 	c := new(WeatherCache)
 	c.cache = cache
 	c.weatherClient = weatherClient
+	c.locker = locker
 	return c
 }
 
@@ -61,6 +65,23 @@ func (c *WeatherCache) GetSetTopCity(ctx context.Context) (string, error) {
 	s, err := c.GetTopCity(ctx)
 	if err != nil {
 		if cache.IsNil(err) {
+			// wait lock
+			keyLockTopCity := "lock:top:city"
+			err := c.locker.LockWait(ctx, keyLockTopCity, 2*time.Second)
+			if err != nil {
+				log.Errorf("locker.LockWait error:%+v, key=%s", err, keyLockTopCity)
+				return "", err
+			}
+			defer func() {
+				_ = c.locker.Unlock(ctx, keyLockTopCity)
+			}()
+
+			// get again
+			s, err := c.GetTopCity(ctx)
+			if err == nil && !cache.IsNil(err) {
+				return s, nil
+			}
+
 			log.Logf("cache.GetTopCity is nil")
 			v2TopCityReq := weatherSdk.NewV2TopCityRequest()
 			v2TopCityReq.Key = conf.GetKey()
@@ -101,6 +122,23 @@ func (c *WeatherCache) GetSetLookupCity(ctx context.Context, key *LookupCityKey)
 	s, err := c.GetLookupCity(ctx, ky)
 	if err != nil {
 		if cache.IsNil(err) {
+			// wait lock
+			keyLockLookupCity := fmt.Sprintf("lock:%s", ky)
+			err := c.locker.LockWait(ctx, keyLockLookupCity, 2*time.Second)
+			if err != nil {
+				log.Errorf("locker.LockWait error:%+v, key=%s", err, keyLockLookupCity)
+				return "", err
+			}
+			defer func() {
+				_ = c.locker.Unlock(ctx, keyLockLookupCity)
+			}()
+
+			// 锁内再读一次
+			s, err := c.GetLookupCity(ctx, ky)
+			if err == nil && !cache.IsNil(err) {
+				return s, nil
+			}
+
 			log.Logf("cache.GetLookupCity is nil, key=%s", ky)
 			v2LookupCityReq := weatherSdk.NewV2LookupCityRequest()
 			v2LookupCityReq.Key = conf.GetKey()
@@ -142,9 +180,26 @@ type IndicesKey struct {
 
 func (c *WeatherCache) GetSetIndices(ctx context.Context, key *IndicesKey) (string, error) {
 	ky := cache.BuildKey(KeyIndices, key.Location, key.Type, key.Duration)
-	s, err := c.cache.Get(ctx, ky)
+	s, err := c.GetIndices(ctx, ky)
 	if err != nil {
 		if cache.IsNil(err) {
+			// wait lock
+			keyLockIndices := fmt.Sprintf("lock:%s", ky)
+			err := c.locker.LockWait(ctx, keyLockIndices, 2*time.Second)
+			if err != nil {
+				log.Errorf("locker.LockWait error:%+v, key=%s", keyLockIndices)
+				return "", err
+			}
+			defer func() {
+				_ = c.locker.Unlock(ctx, keyLockIndices)
+			}()
+
+			// get again
+			s, err := c.GetIndices(ctx, ky)
+			if !cache.IsNil(err) && err == nil {
+				return s, nil
+			}
+
 			log.Logf("cache.GetIndices is nil,key=%s", ky)
 			v7IndicesReq := weatherSdk.NewV7IndicesRequest()
 			v7IndicesReq.Key = conf.GetKey()
@@ -191,6 +246,23 @@ func (c *WeatherCache) GetSetNow(ctx context.Context, key *NowKey) (string, erro
 	s, err := c.GetNow(ctx, ky)
 	if err != nil {
 		if cache.IsNil(err) {
+			// wait lock
+			keyLockNow := fmt.Sprintf("lock:%s", ky)
+			err := c.locker.LockWait(ctx, keyLockNow, 2*time.Second)
+			if err != nil {
+				log.Errorf("locker.LockWait error:%+v, key=%s", err, keyLockNow)
+				return "", err
+			}
+			defer func() {
+				_ = c.locker.Unlock(ctx, keyLockNow)
+			}()
+
+			// get again
+			s, err := c.GetNow(ctx, ky)
+			if !cache.IsNil(err) && err == nil {
+				return s, nil
+			}
+
 			log.Infof("cache.GetNow is nil,key=%s", ky)
 			v7WeatherNowReq := weatherSdk.NewV7WeatherNowRequest()
 			v7WeatherNowReq.Key = conf.GetKey()
@@ -236,6 +308,23 @@ func (c *WeatherCache) GetSetForecast(ctx context.Context, key *ForecastKey) (st
 	s, err := c.GetForecast(ctx, ky)
 	if err != nil {
 		if cache.IsNil(err) {
+			// wait lock
+			keyLockForecast := fmt.Sprintf("lock:%s", ky)
+			err := c.locker.LockWait(ctx, keyLockForecast, 2*time.Second)
+			if err != nil {
+				log.Errorf("locker.LockWait error:%+v, key=%s", err, keyLockForecast)
+				return "", err
+			}
+			defer func() {
+				_ = c.locker.Unlock(ctx, keyLockForecast)
+			}()
+
+			// get again
+			s, err := c.GetForecast(ctx, ky)
+			if !cache.IsNil(err) && err == nil {
+				return s, nil
+			}
+
 			log.Infof("cache.GetForecast is nil,key=%s", ky)
 			v7WeatherDaysReq := weatherSdk.NewV7WeatherDaysRequest()
 			v7WeatherDaysReq.Key = conf.GetKey()

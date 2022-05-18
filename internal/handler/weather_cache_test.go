@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
 	"github.com/taadis/qweather-sdk-go"
 	"github.com/taadis/weather-api/internal/cache"
+	"github.com/taadis/weather-api/internal/lock"
 )
 
 var (
@@ -27,7 +29,8 @@ func TestMain(m *testing.M) {
 	})
 	cache := cache.NewCache(rdb)
 	weatherClient := qweather.NewClient()
-	weatherCache = NewWeatherCache(cache, weatherClient)
+	locker := lock.NewLockRedis(rdb)
+	weatherCache = NewWeatherCache(cache, weatherClient, locker)
 	weather = NewWeather(weatherCache)
 	m.Run()
 }
@@ -60,4 +63,22 @@ func TestCache_GetTopCityWithSet(t *testing.T) {
 	}
 
 	t.Logf("cacheClient.GetTopCityWithSet result:%s", s)
+}
+
+// 并发请求的时候,会产生缓存击穿问题,补充锁机制及重读
+func TestWeatherCache_GetSetTopCity_Breakdown(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			s, err := weatherCache.GetSetTopCity(ctx)
+			if err != nil {
+				t.Fatalf("cacheClient.GetTopCityWithSet error:%+v", err)
+			}
+
+			t.Logf("cacheClient.GetTopCityWithSet result:%s", s)
+		}(&wg)
+	}
+	wg.Wait()
 }
